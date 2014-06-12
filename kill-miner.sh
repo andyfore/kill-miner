@@ -2,6 +2,8 @@
 
 # Variable definitions
 #
+# recipient - e-mail address that notifications are sent to
+# sender - e-mail address that notifications are sent from (can be same as recipient if desired)
 # user_id - string to hold the UID(s) of the suspect process(es)
 # arr_user_id - string array to handle occurrence of multiple UIDs
 # user_id_single - string variable to hold the current UID being processed
@@ -11,6 +13,12 @@
 # pid_binary_path - string to hold the absolute path of the executable tied to miner_pid_single
 # pid_directory_path - string to hold the directory path containing the executable tied to miner_pid_single
 # binary_names - string to hold the search pattern to use
+
+# notification e-mail address
+recipient="abuse@yourcompany.com"
+
+# sender e-mail address
+sender="root@server.yourcompany.com"
 
 # binary names to hunt for
 # add additional binary names to this string as they are found
@@ -82,7 +90,7 @@ else
         echo "Files were removed and process was killed" >> /tmp/miner.out
         echo "" >> /tmp/miner.out
         echo "Please suspend user ${user_id_single}" >> /tmp/miner.out
-        cat /tmp/miner.out | mail -s "Miner process found on lnh-sshftp1a" atlitops@web.com -- -f atlitops@web.com
+        cat /tmp/miner.out | mail -s "Miner process found on lnh-sshftp1a" $recipient -- -f $sender
         rm /tmp/miner.out
 
         echo ${user_id_single}
