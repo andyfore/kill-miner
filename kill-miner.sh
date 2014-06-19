@@ -13,6 +13,7 @@
 # pid_binary_path - string to hold the absolute path of the executable tied to miner_pid_single
 # pid_directory_path - string to hold the directory path containing the executable tied to miner_pid_single
 # binary_names - string to hold the search pattern to use
+# bad_sites - string to hold the domains known to be bad
 
 # notification e-mail address
 recipient="abuse@yourcompany.com"
@@ -95,4 +96,45 @@ else
 
         echo ${user_id_single}
     done
+fi
+
+# sites determined as bad
+bad_sites="(updates.dyndn-web)||(updates.dyndn-web.com)"
+
+# look for all UID running wget to the established suspect site(s) processes
+user_id=`ps -ef | grep -i wget | egrep -i $bad_sites  | grep -v grep | awk '{print $1}' | sort -u`
+
+# put UIDs in an array to account for multiple broken accounts
+arr_user_id=($user_id)
+
+# check to see if the array of user id's is empty
+if [ ${#arr_user_id[@]} = 0 ]; then
+  echo "no miner process found"
+  exit 0
+else
+  echo "Notice: Suspect process found, investigating..."
+
+  # kill each of the wget processes
+  ps -ef | grep wget | grep updates.dyndn-web | grep -v grep | awk '{print $2}' | xargs kill -9
+
+  # sanitize the user crontab
+  echo "Sanitizing user crontabs"
+  for user_id_single in "${arr_user_id[@]}"
+  do
+    sed -i '/updates.dyndn-web/d' /var/spool/cron/${user_id_single}
+
+    # create and send email then clean up
+    date > /tmp/miner.out
+    echo "" >> /tmp/miner.out
+    echo "User ID: ${user_id_single} was found to be running mining process" >> /tmp/miner.out
+    echo "" >> /tmp/miner.out
+    echo "Crontab for user ${user_id_single} was sanitized and process was killed" >> /tmp/miner.out
+    echo "" >> /tmp/miner.out
+    echo "Please suspend user ${user_id_single}" >> /tmp/miner.out
+    cat /tmp/miner.out | mail -s "Miner process found on lnh-sshftp1a" ${recipient} -- -f ${sender}
+    rm /tmp/miner.out
+
+    # return the user id for account suspension
+    echo ${user_id_single}
+  done
 fi
