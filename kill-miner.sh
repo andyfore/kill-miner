@@ -23,7 +23,7 @@ sender="root@server.yourcompany.com"
 
 # binary names to hunt for
 # add additional binary names to this string as they are found
-binary_names="(kernelupdates)|(kernelcfg)|(kernelorg)|(kernelupgrade)"
+binary_names="(kernelupdates)|(kernelcfg)|(kernelorg)|(kernelupgrade)|(named)"
 
 # look for all UID running miner processes
 user_id=`ps -ef | egrep $binary_names | grep -v grep | awk '{print $1}'`
@@ -33,7 +33,7 @@ arr_user_id=($user_id)
 
 # check to see if the array of user id's is empty
 if [ ${#arr_user_id[@]} = 0 ]; then
-    echo "no miner process found"
+    echo "First heuristic found no processes"
     exit 0
 else
     echo "Notice: Suspect process found, investigating..."
@@ -99,7 +99,7 @@ else
 fi
 
 # sites determined as bad
-bad_sites="(updates.dyndn-web)||(updates.dyndn-web.com)"
+bad_sites="(updates.dyndn-web)|(updates.dyndn-web.com)"
 
 # look for all UID running wget to the established suspect site(s) processes
 user_id=`ps -ef | grep -i wget | egrep -i $bad_sites  | grep -v grep | awk '{print $1}' | sort -u`
@@ -109,7 +109,7 @@ arr_user_id=($user_id)
 
 # check to see if the array of user id's is empty
 if [ ${#arr_user_id[@]} = 0 ]; then
-  echo "no miner process found"
+  echo "Second heuristic found no processes"
   exit 0
 else
   echo "Notice: Suspect process found, investigating..."
