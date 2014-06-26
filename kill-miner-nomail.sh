@@ -31,6 +31,9 @@
 # Version 1.4
 # - added new variable to hold the bad urls used by the new attack vector
 # - added new loop structure to handle new attack vector
+# Version 1.4.1
+# - fixed syntax error in code holding heuristic patterns
+# - added differentiation in the exit statement replacing "no miner process found"
 
 # Variable definitions
 #
@@ -47,7 +50,7 @@
 
 # binary names to hunt for
 # add additional binary names to this string as they are found
-binary_names="(kernelupdates)|(kernelcfg)|(kernelorg)|(kernelupgrade)"
+binary_names="(kernelupdates)|(kernelcfg)|(kernelorg)|(kernelupgrade)|(named)"
 
 # look for all UID running miner processes
 user_id=`ps -ef | egrep $binary_names | grep -v grep | awk '{print $1}'`
@@ -57,7 +60,7 @@ arr_user_id=($user_id)
 
 # check to see if the array of user id's is empty
 if [ ${#arr_user_id[@]} = 0 ]; then
-    echo "no miner process found"
+    echo "First heuristic found no processes"
 else
     echo "Notice: Suspect process found, investigating..."
     # process each UID found
@@ -107,7 +110,7 @@ else
 fi
 
 # sites determined as bad
-bad_sites="(updates.dyndn-web)||(updates.dyndn-web.com)"
+bad_sites="(updates.dyndn-web)|(updates.dyndn-web.com)"
 
 # look for all UID running wget to the established suspect site(s) processes
 user_id=`ps -ef | grep -i wget | egrep -i $bad_sites  | grep -v grep | awk '{print $1}' | sort -u`
@@ -117,7 +120,7 @@ arr_user_id=($user_id)
 
 # check to see if the array of user id's is empty
 if [ ${#arr_user_id[@]} = 0 ]; then
-  echo "no miner process found"
+  echo "Second heuristic found no processes"
   exit 0
 else
   echo "Notice: Suspect process found, investigating..."
