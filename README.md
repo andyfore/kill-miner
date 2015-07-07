@@ -7,7 +7,7 @@ To look for a miner process that is running in a compromised account. The script
 
 *Created* 2014-05-20
 
-*Original Author* Andrew Fore [afore@web.com](mailto:afore@web.com)
+*Original Author* Andrew Fore [andy.fore@arfore.com](mailto:andy.fore@arfore.com)
 
 **File List**
 
